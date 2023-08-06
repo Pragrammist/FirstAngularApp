@@ -1,0 +1,37 @@
+<div class="w-25 container">
+    <ul>
+        <li *ngIf="errorMessage !== undefined" class="text-danger">
+            {{errorMessage}}    
+        </li>
+        <li *ngIf="!isBadRequest && registerUserFromServerResult !== undefined" class="text-success">
+            <!-- вывод сообщения успеха -->
+            <!-- но пользователь его не увидит так как происходит редирект -->
+            <!-- сделано так потому что изначельно редикер не предусматривался -->
+            {{ (registerUserFromServerResult | async) }}
+        </li>
+    </ul>
+    
+    <form action="post" class="register-form" autocomplete="off" >
+        <div class="form-email-aria">
+            <label for="email" class="text-secondary text-left">Почта</label>
+            <input type="text" name="email" [(ngModel)]="userToRegist.email" class="form-control">
+        </div>
+        <div class="form-login-aria">
+            <label for="login" class="text-secondary">Логин</label><br>
+            <input type="text" name="login" [(ngModel)]="userToRegist.login" class="form-control">
+        </div>
+        <div class="form-password-aria">
+            <label for="password" class="text-secondary">Пароль</label><br>
+            <input type="password" name="password" [(ngModel)]="userToRegist.password" class="form-control">
+        </div>
+        <div class="form-password-aria">
+            <label for="password2" class="text-secondary">Повторный пароль</label><br>
+            <input type="password" name="password2" [(ngModel)]="userToRegist.password2" class="form-control">
+        </div>
+        <div class="form-button-aria">
+            <button type="button" (click)="sendUserToRegist()" class="btn btn-primary" [ngClass]="{disabled: !isUserDataValid()}">Отправить!</button>
+        </div>
+    </form>
+</div>
+
+

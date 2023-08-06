@@ -1,0 +1,27 @@
+<div class="w-25 container">
+    <ul>
+        <li *ngIf="errorMessage !== undefined" class="text-danger">
+            {{errorMessage}}
+        </li>
+        <!-- точно такая же ситация как с регистрацией(читайте сначала регистарцию) -->
+        <li *ngIf="!isBadRequest && authorizeMessage !== undefined" class="text-success">
+            {{ (authorizeMessage | async) }}
+        </li>
+    </ul>
+    <div>
+        <div class="form-loginOrEmail-aria">
+            <label for="loginOrEmail" class="text-secondary">Логин или почта</label><br>
+            <input type="text" name="loginOrEmail" [(ngModel)]="loginUserModel.loginOrEmail" class="form-control">
+        </div>
+        <div class="form-password-aria">
+            <label for="password" class="text-secondary">Пароль</label><br>
+            <input type="password" name="password" [(ngModel)]="loginUserModel.password" class="form-control">
+        </div>
+        <div class="form-button-aria" >
+            <button type="submit" (click)="sendAuthorize()" class="btn btn-primary" [ngClass]="{disabled: !isUserDataValid()}">Авторизоваться!</button>
+        </div>
+    </div>
+    
+</div>
+
+

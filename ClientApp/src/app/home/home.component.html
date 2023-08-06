@@ -1,0 +1,54 @@
+<!-- если два раза кликнуть на этот контейнер то можно увидеть -->
+<!-- со своим имейлом и логином -->
+<!-- есди еще раз два раза кликнуть то можно вернуться к офрме -->
+<!-- для заполнения данных которые нужно поменят -->
+<div class="w-25 container mt-5" (dblclick)="showOrHideLoginInfo()">
+  <!-- если нужно отображать инфу пользователя -->
+  <div *ngIf="showLogin">
+    <div>
+      <label>Ваш логин:</label>
+      <label class="ms-1">{{currentLogin}}</label>
+    </div>  
+  
+    <div class="mt-5">
+      <label> Ваша почта:</label>
+      <label class="ms-1">{{currentEmail}}</label>
+    </div>
+  </div>
+  <!-- елси инфу пользователя нужно менять -->
+  <div *ngIf="!showLogin">
+    <ul>
+      <li *ngIf="errorMessage !== undefined" class="text-danger">
+        {{errorMessage}}
+      </li>
+      <li *ngIf="!isBadRequest && changeDataMessage !== undefined && errorMessage === undefined" class="text-success">
+        {{ (changeDataMessage | async) }}
+      </li>  
+    </ul>
+  
+    <div>
+      <div>
+        <label>Ваш текущий пароль</label><br>
+        <input type="password" name="currentPassword" [(ngModel)]="newUserData.currentPassword" class="form-control">
+      </div>
+      <div>
+        <label>Новый пароль</label><br>
+        <input type="password" name="newPassword" [(ngModel)]="newUserData.newPassword" class="form-control">
+      </div>
+      <div>
+        <label>Новая почта</label><br>
+        <input type="text" name="newEmail" [(ngModel)]="newUserData.newEmail" class="form-control">
+      </div>
+      
+      <div>
+        <label>Новый логин</label><br>
+        <input type="text" name="newLogin" [(ngModel)]="newUserData.newLogin" class="form-control">
+      </div>
+      <div>
+        <button id="changeUserDataButton" type="button" (click)="SendDataToChange()" class="btn btn-primary mt-3" [ngClass]="{disabled: !isNewUserDataModelValid()}">Изменить</button>
+      </div>
+    </div>
+  </div>
+  
+  
+</div>
