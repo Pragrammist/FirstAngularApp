@@ -1,0 +1,54 @@
+<header>
+  <nav
+    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
+  >
+    <div class="container">
+      <a class="navbar-brand" [routerLink]="['/']">Мое первое приложение на ангуляр!</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target=".navbar-collapse"
+        aria-label="Toggle navigation"
+        [attr.aria-expanded]="isExpanded"
+        (click)="toggle()"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div
+        class="navbar-collapse collapse d-sm-inline-flex justify-content-end"
+        [ngClass]="{ show: isExpanded }"
+      >
+        <ul class="navbar-nav flex-grow">
+          <li
+            class="nav-item"
+            [routerLinkActive]="['link-active']"
+            [routerLinkActiveOptions]="{ exact: true }"
+            *ngIf="userLogin !== undefined"
+          >
+            <a class="nav-link text-dark" [routerLink]="['/main']">Личная информация</a>
+          </li>
+          <li class="nav-item" *ngIf="userLogin !== undefined" [routerLinkActive]="['link-active']">
+            <a class="text-dark nav-link" [routerLink]="['/main/secret-stash']">Секретное место</a>
+          </li>
+          <li class="nav-item" *ngIf="userLogin !== undefined" [routerLinkActive]="['link-active']">
+            <a class="text-dark nav-link" [routerLink]="['/main/goals']">Цели</a>
+          </li>
+          <li class="nav-item" *ngIf="userLogin !== undefined" [routerLinkActive]="['link-active']">
+            <a class="text-dark nav-link" [routerLink]="['/main/achievments']">Достижения</a>
+          </li>
+          <li class="nav-item" [routerLinkActive]="['link-active']" *ngIf="userLogin === undefined">
+            <a class="nav-link text-dark" [routerLink]="['/register']">Регистрация</a>
+          </li>
+          <li class="nav-item" [routerLinkActive]="['link-active']" *ngIf="userLogin === undefined">
+            <a class="nav-link text-dark" [routerLink]="['/authorize']">Авторизация</a>
+          </li>
+          <li class="nav-item" *ngIf="userLogin !== undefined">
+            <!-- при нажатии на это сообщение происходит логаут -->
+            <label class="text-dark nav-link" (click)="helloMessageLogout()">Привет, {{userLogin}}!</label>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

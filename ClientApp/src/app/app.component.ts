@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
-import { UserCookieService } from './userCookieService';
-import { UserService } from './UserService';
+import { UserCookieService } from './core/user/user-cookie.service';
 import { timer } from 'rxjs';
+import { UserService } from './core/user/user.service';
 
 
 @Component({
@@ -11,7 +11,7 @@ import { timer } from 'rxjs';
 })
 export class AppComponent {
 
-  
+  t : string = "sdfsdf"
   constructor(currentUserService : UserService, userCookieService : UserCookieService)
   {
     //проверка по кукам на на наличие авторизации
