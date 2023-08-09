@@ -1,7 +1,8 @@
 
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { UserService } from '../core/user/user.service';
+import { UserService } from '../user/user.service';
+
 
 
 export const redirectOnLogout =  (route: ActivatedRouteSnapshot, state: RouterStateSnapshot, ) => {

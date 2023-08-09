@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { authGuard } from './shared/auth.guard';
-import { redirectOnLogout } from './shared/regirect-on-logout.guard';
-import { redirectOnLogin } from './shared/redirect-on-login.guard';
+import { authGuard } from './core/guards/auth.guard';
+import { redirectOnLogin } from './core/guards/redirect-on-login.guard';
+import { redirectOnLogout } from './core/guards/regirect-on-logout.guard';
+
 
 
 const routes :Routes = [

@@ -11,20 +11,12 @@ import { UserCookieService } from 'src/app/core/user/user-cookie.service';
 @Injectable()
 export class ChangeUserDataService
 {
-    private url;
-    constructor(private http: HttpClient, private cookieService : UserCookieService, @Inject('BASE_URL') baseUrl: string){
-        this.url = baseUrl + "user/";
-    }
+    private url = "/user";
+    constructor(private http: HttpClient){}
 
     changeUserData(userData : ChangeUserDataModel)
     {
-        return this.http.put<ChangeUserDataResponseModel>(this.url, userData, {
-            headers:{
-                //авторизация по токену
-                "Authorization": "Bearer " + this.cookieService.getJwtToken(),
-                "Content-type": "application/json",
-                "Accept" : "application/json"
-            }
-        });
+        let http2 = this.http.disableBearerToken();
+        return http2.put<ChangeUserDataResponseModel>(this.url, userData);
     }
 }

@@ -13,10 +13,8 @@ import { UserRegisterResponseModel } from './models/user-register-response.model
 @Injectable()
 export class UserRegisterService 
 {
-    private url;
-    constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string)
-    {
-        this.url = baseUrl + "user/";
+    private url = "/user";
+    constructor(private http: HttpClient){        
     }
     
     registerUser(user : UserRegisterModel)

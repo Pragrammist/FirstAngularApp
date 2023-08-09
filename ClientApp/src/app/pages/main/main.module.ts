@@ -7,10 +7,13 @@ import { CommonModule } from "@angular/common";
 import { SecretStashComponent } from './secret-stash/secret-stash.component';
 import { GoalsComponent } from './goals/goals.component';
 import { AchievementsComponent } from './achievements/achievements.component';
+import { mainHttpInterceptorProviders } from "./main-http-interceptors-providers";
+import { HttpClientModule } from "@angular/common/http";
 
 
 @NgModule({
-    imports: [FormsModule, MainRoutingModule, CommonModule],
+    imports: [FormsModule, MainRoutingModule, CommonModule], //HttpClientModule, 
+    //providers: [mainHttpInterceptorProviders], не влияет ни как
     declarations: [ HomeComponent, SecretStashComponent, GoalsComponent, AchievementsComponent],
     exports: [ HomeComponent],
     bootstrap: [AppComponent],       // экспортируем компонент

@@ -10,13 +10,6 @@ export const authGuard =  (route: ActivatedRouteSnapshot, state: RouterStateSnap
     if(userCookieService.isAuthorized())
         return true;
     
-    let firstChildOfroute = route.firstChild?.url.toString();
-    
-    let parentOfRoute = route.url.toString();
-    
-    let pathToRedirect : string | undefined = undefined;
-    
-    pathToRedirect = "/" + parentOfRoute! + "/"+ firstChildOfroute!;
 
     let path = router.parseUrl('/authorize');
 
