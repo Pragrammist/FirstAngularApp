@@ -1,8 +1,6 @@
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
-
 using ang_app;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,22 +10,37 @@ builder.Services.AddControllers();
 
 builder.Services.AddAuthorization();
 
+
+var userService = new UserService();
+
+var tokenService = new TokenService(userService);
+
+
+
+
+
 builder.Services
 .AddAuthentication(x => {
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultAuthenticateScheme = "bearer_access_token";
+    x.DefaultChallengeScheme = "bearer_access_token";
+    x.DefaultScheme = "bearer_access_token";
 })
-.AddJwtBearer(options =>
+.AddJwtBearer("bearer_access_token",options =>
 {
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = AuthOptions.TokenValidationParameters;
+    options.TokenValidationParameters = BearerAccessTokenOptions.TokenValidationParameters;
+})
+.AddJwtBearer("bearer_refresh_token", options =>
+{
+    //default validator. It is needed
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = BearerRefreshTokenOptions.TokenValidationParameters;
 });
 
 
 //builder.Services.AddCors();
-builder.Services.AddSingleton<UserService>();
-
+builder.Services.AddSingleton(userService);
+builder.Services.AddSingleton(tokenService);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -55,35 +68,3 @@ app.MapControllers();
 //app.MapFallbackToFile("index.html");
 
 app.Run();
-
-public class AuthOptions
-{
-    public const string ISSUER = "MyAuthServer"; // издатель токена
-    public const string AUDIENCE = "MyAuthClient"; // потребитель токена
-    const string KEY = "5XGgEtGK9jsNxIUQvxef7wtAE6LwbLWd6LFwpryYoF9w==";   // ключ для шифрации
-    public const int LIFETIME = 1; // время жизни токена - 1 минута
-    public static SymmetricSecurityKey GetSymmetricSecurityKey()
-    {
-        return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(KEY));
-    }
-    public static TokenValidationParameters TokenValidationParameters => new TokenValidationParameters
-    {
-        // укзывает, будет ли валидироваться издатель при валидации токена
-        ValidateIssuer = true,
-        // строка, представляющая издателя
-        ValidIssuer = AuthOptions.ISSUER,
-
-        // будет ли валидироваться потребитель токена
-        ValidateAudience = true,
-        // установка потребителя токена
-        ValidAudience = AuthOptions.AUDIENCE,
-        // будет ли валидироваться время существования
-        ValidateLifetime = true,
-
-        ClockSkew = TimeSpan.Zero,
-        // установка ключа безопасности
-        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-        // валидация ключа безопасности
-        ValidateIssuerSigningKey = true,
-    };
-}

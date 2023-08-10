@@ -2,11 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using ang_app.UserRegisterModels;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using ang_app.Models.UserLoginModel;
 using ang_app.Models.UserChangeDataModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace ang_app.Controllers
 {
@@ -17,11 +15,12 @@ namespace ang_app.Controllers
         private readonly ILogger<UserController> _logger;
 
         private readonly UserService _userService;
-
-        public UserController(ILogger<UserController> logger, UserService userService)
+        readonly TokenService _tokenService;
+        public UserController(ILogger<UserController> logger, UserService userService, TokenService tokenService)
         {
             _logger = logger;
             _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpPost]
@@ -32,28 +31,30 @@ namespace ang_app.Controllers
             _logger.LogInformation("Пользователь добавился: {0}", isRegistered);
 
             string? token = null;
-
+            string? refreshToken = null;
             if(!isRegistered)
                 return BadRequest(
                     new {
                         IsError = true,
                         Message = "Такой пользователь уже есть!",
-                        Token = token
+                        Token = token,
+                        RefreshToken = refreshToken,
                     }
                 );
             
-            token = Token(user.Login, user.Email);
-
+            token = _tokenService.AccessToken(user.Login, user.Email);
+            refreshToken = _tokenService.RefreshToken(user.Login, user.Email);
             var res = new {
                 IsError = false,
                 Message = "Вы зарегестрировались!",
-                Token = token
+                Token = token,
+                RefreshToken = refreshToken,
             };
 
             return Ok(res);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPut]
         public IActionResult ChangeUserData([FromBody] UserChangeDataModel userChangeDataModel)
         {
@@ -62,36 +63,38 @@ namespace ang_app.Controllers
             var newUser = _userService.ChangeUser(login, userChangeDataModel);
 
             string? token = null;
-
+            string? refreshToken = null;
             if(newUser is null)
                 return BadRequest(new {
                     IsError = true,
                     Message = "Неверный пароль или переданные данные не отличаются от текущих!",
                     Token = token,
-                    NewUser = newUser
+                    NewUser = newUser,
+                    RefreshToken = refreshToken,
                 });
 
-            token = Token(newUser.Login, newUser.Email);
-
+            token = _tokenService.AccessToken(newUser.Login, newUser.Email);
+            refreshToken = _tokenService.RefreshToken(login, newUser.Email);
             return Ok(
                 new {
                     IsError = false,
                     Message = "Данные изменены!",
                     Token = token,
-                    NewUser = newUser
+                    NewUser = newUser,
+                    RefreshToken = refreshToken,
                 }
             );
         }
 
         [HttpPost("login")]
-        public IActionResult LoginUser(UserLoginModel userLogimModel)
+        public IActionResult LoginUser(UserLoginModel userLoginModel)
         {
-            var user = _userService.LoginUser(userLogimModel);
+            var user = _userService.LoginUser(userLoginModel);
             
             _logger.LogInformation("Пользователь авторизовался: {0}", user is not null);
 
             string? token = null;
-
+            string? refreshToken = null;
             if(user is null)
             {
                 return BadRequest(
@@ -99,18 +102,20 @@ namespace ang_app.Controllers
                         IsError = true,
                         Message = "Пользователь не существует!",
                         Token = token,
-                        User = user
+                        User = user,
+                        RefreshToken = refreshToken,
                     }
                 );
             }
 
-            token = Token(user.Login, user.Email);
-            
+            token = _tokenService.AccessToken(user.Login, user.Email);
+            refreshToken = _tokenService.RefreshToken(token, user.Email);
             var res = new {
                 IsError = false,
                 Message = "Вы авторизовались!",
                 Token = token,
-                User = user
+                User = user,
+                RefreshToken = refreshToken,
             };
             
             return Ok(res);
@@ -119,10 +124,11 @@ namespace ang_app.Controllers
         [HttpGet("validateToken")]
         public IActionResult CheckToken(string token)
         {
-            SecurityToken validatedToken;
             var tokenHandler = new JwtSecurityTokenHandler();
-            try{
-                tokenHandler.ValidateToken(token, AuthOptions.TokenValidationParameters, out validatedToken);
+            
+            try
+            {
+                tokenHandler.ValidateToken(token, BearerAccessTokenOptions.TokenValidationParameters, out SecurityToken validatedToken);
                 return Ok();
             }   
             catch{
@@ -133,44 +139,29 @@ namespace ang_app.Controllers
         }
 
 
-        public string Token(string login, string email)
+        [HttpPost("refreshToken")]
+        [Authorize(AuthenticationSchemes = "bearer_refresh_token")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authorization">// Bearer {token}</param>
+        /// <returns></returns>
+        public IActionResult GetRefreshToken([FromHeader]string authorization)
         {
-            var claims = GetIdentity(login, email);
+            var token = authorization.Split().ElementAt(1);
+            var login = User?.Identity?.Name ?? throw new NullReferenceException("Identity login is null");
+            var email = User?.Claims?.FirstOrDefault(c => c.Type.Contains("email"))?.Value ?? throw new NullReferenceException("Identity email is null");;
+
+            var newRefreshToken = _tokenService.UpdateRefreshToken(login, email, token);
             
- 
-            var now = DateTime.UtcNow;
+            var accessToken = _tokenService.AccessToken(login, email);
+            if(newRefreshToken == null)
+                return Unauthorized();
             
-            var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    notBefore: now,
-                    claims: claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
- 
-            return encodedJwt;
+            return Ok(new {
+                refreshToken = newRefreshToken,
+                token = accessToken
+            });
         }
- 
-        private List<Claim> GetIdentity(string login, string email)
-        {
-            var user = _userService.FindUser(login, email);
-
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-                //роль нужна для галочки,, чтобы просто была
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, "user"),
-                new Claim("email", email)
-            };
-
-            
-            return claims;
- 
-        }
-    
-    
-        
     }
 }
