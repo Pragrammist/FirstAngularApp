@@ -1,7 +1,10 @@
 import { Inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, Subscription, timer, zip } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription, catchError, of, tap, timer, zip } from 'rxjs';
 import { UserCookieService } from './user-cookie.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { AuthorizeUserInCookie } from './models/authorize-user-in-cookie.model';
+import { UserTokensModel } from './models/user-tokens.model';
+
 
 
 // главный сервис для работы с пользователями
@@ -97,14 +100,17 @@ export class UserService{
     {
         this.userTokenSub$.next(token);
     }
-    //метод которым сразу можно вызвать выше упомянутые методы
-    setAllUserDataAsEvent(login : string | undefined, email : string | undefined, token : string | undefined)
+
+    setAllUserDataAsEvent(user : AuthorizeUserInCookie | undefined)
     {   
-        this.setLoginAsEvent(login);
-        this.setEmailAsEvent(email);
+
+        this.setLoginAsEvent(user?.login);
+        this.setEmailAsEvent(user?.email);
         //данный вызов ни на что в текущий момент
         //ни на что не влияет
-        this.setTokenAsEvent(token);
+        this.setTokenAsEvent(user?.token);
+
+        //рефреш токен потом отправлять, если нужно
     }
 
     //как умпонилось выше
@@ -144,7 +150,7 @@ export class UserService{
     //в tokenIsValid записывается результат метода tokenChecker
     checkCurrentToken(tokenChecker:(tokenIsValid: boolean) => void)
     {
-        let currentUserToken = this.userCookieService.getJwtToken();
+        let currentUserToken = this.userCookieService.getAccessToken();
         this.http.get(this.validateTokenUrl, {params: {token: currentUserToken} }).subscribe({
             next:()=>{
                 tokenChecker(true);//токен валидный
@@ -155,8 +161,31 @@ export class UserService{
         });
     }
 
-
-
+    updateTokens()
+    {
+        
+        let currentRefreshToken = this.userCookieService.getRefreshToken();
+        return this.http
+            .disableAccessToken()
+            .disableRefreshToken()
+            .post<UserTokensModel>("/user/refreshtoken", {}, {
+                headers:{
+                    "Authorization":"Bearer " + currentRefreshToken
+                }
+            })
+            .pipe(
+                tap(tokens => {
+                    this.userCookieService.updateTokens(tokens);
+                }),
+                catchError(() =>{
+                    this.logoutAndSendEvent();
+                    return of();
+                })
+            )
+            
+        
+    }
+    
 
     //снова к объединению трех источнику данных
     //на вход подается функция где можно прочитать изменения переменных
@@ -194,7 +223,7 @@ export class UserService{
     }   
 
     //авторизация
-    authorizeAndSendEvent(token : string, login : string, email : string)
+    authorizeAndSendEvent(user : AuthorizeUserInCookie)
     {
         //отправка события логин
         //отправляет undefined так как данные не принимаются у события
@@ -202,11 +231,11 @@ export class UserService{
 
         //хоть и метод называется authorize
         //но лишь записываются данные в куки
-        this.userCookieService.authorize(login, token, email);
+        this.userCookieService.authorize(user);
         //вызов событий на изменения login, email, token
-        this.setAllUserDataAsEvent(login, email, token);
+        this.setAllUserDataAsEvent(user);
         //запуск таймера логаута
-        this.logoutWhenTokenExpired(true);
+        //this.logoutWhenTokenExpired(true);
     }
 
     //отвечает за лоаут
@@ -216,7 +245,7 @@ export class UserService{
         this.userCookieService.clearAllUsersCookie();
         //посывалаем события на изменения текущего логина
         //но так как логаут то везде отсылается undefined
-        this.setAllUserDataAsEvent(undefined, undefined, undefined);
+        this.setAllUserDataAsEvent(undefined);
         //вызов события  логаута
         this.userLogout$.next(undefined);
 
@@ -228,3 +257,4 @@ export class UserService{
     }
       
 }
+

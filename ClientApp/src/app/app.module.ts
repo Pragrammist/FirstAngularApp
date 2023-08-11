@@ -11,10 +11,10 @@ import { AuthorizeUserService } from './core/authorize/authorize-user.service';
 import { ChangeUserDataService } from './core/home/change-data-user.service';
 import { UserRegisterService } from './core/register/userRegisterService';
 import { AppRoutingModule } from './app-routing.module';
-import { httpInterceptorProviders } from './core/http/http-interceptors-providers';
 import { HttpService } from './core/http/http.serivce';
 import { BearerTokenInterceptor } from './core/http/interceptors/bearer-token.interceptor';
 import { SetDefaultUrlInterceptor } from './core/http/interceptors/set-default-url.interceptor';
+import { RefreshTokenInterceptor } from './core/http/interceptors/refresh-token.interceptor';
 
 
 
@@ -31,7 +31,7 @@ import { SetDefaultUrlInterceptor } from './core/http/interceptors/set-default-u
     SharedModule,
     AppRoutingModule
   ],
-  providers: [SetDefaultUrlInterceptor, BearerTokenInterceptor,  {provide: HttpClient, useClass: HttpService},
+  providers: [SetDefaultUrlInterceptor, BearerTokenInterceptor, RefreshTokenInterceptor,   {provide: HttpClient, useClass: HttpService},
      UserService, UserCookieService, AuthorizeUserService, ChangeUserDataService, UserRegisterService],
   bootstrap: [AppComponent]
 })

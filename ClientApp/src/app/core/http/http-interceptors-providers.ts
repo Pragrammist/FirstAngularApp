@@ -5,7 +5,7 @@ import { SetDefaultUrlInterceptor } from './interceptors/set-default-url.interce
 
 
 /** Http interceptor providers in outside-in order */
-export const httpInterceptorProviders = [
-  { provide: HTTP_INTERCEPTORS, useClass: SetDefaultUrlInterceptor, multi: true },
-  { provide: HTTP_INTERCEPTORS, useClass: BearerTokenInterceptor, multi: true },
-];
+// export const httpInterceptorProviders = [
+//   { provide: HTTP_INTERCEPTORS, useClass: SetDefaultUrlInterceptor, multi: true },
+//   { provide: HTTP_INTERCEPTORS, useClass: BearerTokenInterceptor, multi: true },
+// ];

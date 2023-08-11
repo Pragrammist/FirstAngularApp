@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 
-import { Observable, catchError, map, of, tap } from 'rxjs';
-import { Router } from '@angular/router';
+import { Observable, catchError, map, of, tap, timer } from 'rxjs';
 import { UserService } from 'src/app/core/user/user.service';
 import { ChangeUserDataModel } from 'src/app/core/home/models/change-user-data.model';
 import { ChangeUserDataResponseModel } from 'src/app/core/home/models/change-user-data-response.model';
 import { ChangeUserDataService } from 'src/app/core/home/change-data-user.service';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -31,8 +31,23 @@ export class HomeComponent{
   //отображение данных
   //и отображение полей для их изменения
   showLogin = false;
-  constructor(private changeUserDataService:ChangeUserDataService, private currentUserService : UserService, router: Router)
+  constructor(private changeUserDataService:ChangeUserDataService, private currentUserService : UserService, private http: HttpClient)
   {
+    timer(3000).subscribe({
+      next:()=>{
+        http.get("/user/s5").subscribe();
+        http.get("/user/s10").subscribe();
+      }
+    })
+
+    timer(3000).subscribe({
+      next:()=>{
+        http.get("/user/s5").subscribe();
+        http.get("/user/s10").subscribe();
+      }
+    })
+    
+    
     //чтобы реагировать на изменения логина и почты
     currentUserService.subscribeToUserData((login, email) => {
       this.currentEmail = email;
@@ -85,7 +100,13 @@ export class HomeComponent{
           return;
         //вызов логики повторной авторизации
         //чтобы обновить куки и таймер
-        this.currentUserService.authorizeAndSendEvent(changeDataRes.token as string, changeDataRes.newUser?.login as string, changeDataRes.newUser?.email as string);
+        //changeDataRes.token as string, changeDataRes.newUser?.login as string, changeDataRes.newUser?.email as string
+        this.currentUserService.authorizeAndSendEvent({
+          email:changeDataRes.newUser?.email as string,
+          login:changeDataRes.newUser?.login as string,
+          refreshToken:changeDataRes.refreshToken as string,
+          token:changeDataRes.token as string
+        });
       }),
       //чтобы по итогу получить сообщение сервера
       //нужен маппинг

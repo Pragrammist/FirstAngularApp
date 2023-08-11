@@ -47,8 +47,13 @@ export class AuthorizeComponent {
       tap((loginRes : AuthorizeUserResponseModel) => {
         if(loginRes.isError)
           return;
-        
-        this.currentUserService.authorizeAndSendEvent(loginRes.token as string, loginRes.user?.login as string, loginRes.user?.email as string);
+        //loginRes.token as string, loginRes.user?.login as string, loginRes.user?.email as string
+        this.currentUserService.authorizeAndSendEvent( {
+          email : loginRes.user?.email as string,
+          login: loginRes.user?.login as string,
+          token: loginRes.token as string,
+          refreshToken: loginRes.refreshToken as string,
+        } );
         
       }),
       map((logRes : AuthorizeUserResponseModel) => logRes.message),

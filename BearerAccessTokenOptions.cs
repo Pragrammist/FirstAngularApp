@@ -6,7 +6,7 @@ class BearerAccessTokenOptions
     public const string ISSUER = "MyAuthServer"; // издатель токена
     public const string AUDIENCE = "MyAuthClient"; // потребитель токена
     const string KEY = "5XGgEtGK9jsNxIUQvxef7wtAE6LwbLWd6LFwpryYoF9w==";   // ключ для шифрации
-    public const int LIFETIME = 1; // время жизни токена - 1 минута
+    public const int LIFETIME = 3; // время жизни токена - 1 минута
     public static SymmetricSecurityKey GetSymmetricSecurityKey()
     {
         return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(KEY));

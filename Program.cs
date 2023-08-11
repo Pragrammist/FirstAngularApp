@@ -5,15 +5,11 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddCors();
 builder.Services.AddControllers();
 
 builder.Services.AddAuthorization();
 
-
-var userService = new UserService();
-
-var tokenService = new TokenService(userService);
 
 
 
@@ -38,9 +34,8 @@ builder.Services
 });
 
 
-//builder.Services.AddCors();
-builder.Services.AddSingleton(userService);
-builder.Services.AddSingleton(tokenService);
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<TokenService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -52,15 +47,16 @@ var app = builder.Build();
 //app.UseHttpLogging(); 
 
 //app.UseStaticFiles();
-
+app.UseCors(builder => builder.WithOrigins("https://localhost:44473").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 app.UseRouting();
 
 //app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+//Access-Control-Allow-Origin
+//WithOrigins("https://localhost:44473").AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithExposedHeaders()
 
-app.UseCors(builder => builder.WithOrigins("https://localhost:44473").AllowAnyHeader().AllowAnyMethod());
 
 
 app.MapControllers();

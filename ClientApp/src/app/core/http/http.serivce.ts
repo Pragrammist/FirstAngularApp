@@ -3,6 +3,7 @@ import { HttpClient, HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HTTP_
 import { Observable } from 'rxjs';
 import { BearerTokenInterceptor } from './interceptors/bearer-token.interceptor';
 import { SetDefaultUrlInterceptor } from './interceptors/set-default-url.interceptor';
+import { RefreshTokenInterceptor } from './interceptors/refresh-token.interceptor';
 
 
 // HttpClient is declared in a re-exported module, so we have to extend the original module to make it work properly
@@ -13,8 +14,9 @@ declare module '@angular/common/http/' {
     // HttpClient with HttpService using dependency injection
     export interface HttpClient {
 
-        disableBearerToken() : HttpClient;
+        disableAccessToken() : HttpClient;
         disableDefaultUrl() : HttpClient;
+        disableRefreshToken() : HttpClient;
         disableAll(): HttpClient;
     }
 
@@ -47,6 +49,7 @@ class HttpInterceptorHandler implements HttpHandler {
 @Injectable()
 export class HttpService extends HttpClient {
 
+    private providedInterceptors = [BearerTokenInterceptor, SetDefaultUrlInterceptor, RefreshTokenInterceptor];
     constructor(private httpHandler: HttpHandler,
         private injector: Injector,
         @Optional() @Inject(HTTP_INTERCEPTORS) private interceptors: HttpInterceptor[] = []) {
@@ -54,23 +57,23 @@ export class HttpService extends HttpClient {
 
         if (!this.interceptors) {
             // Configure default interceptors that can be disabled here
-            this.interceptors = [
-                this.injector.get(BearerTokenInterceptor),
-                this.injector.get(SetDefaultUrlInterceptor),
-            ];
+            
+            this.interceptors = this.providedInterceptors.map(v => this.injector.get(v));
             
         }
     }
 
 
     override disableAll(): HttpClient {
-        return this
-            .removeInterceptor(BearerTokenInterceptor)
-            .removeInterceptor(SetDefaultUrlInterceptor);
-            
+        let clientResult : HttpService = this;
+        this.providedInterceptors.forEach(int => clientResult = clientResult.removeInterceptor(int));
+        return clientResult;
     }
-    override disableBearerToken(): HttpClient {
+    override disableAccessToken(): HttpClient {
         return this.removeInterceptor(BearerTokenInterceptor);
+    }
+    override disableRefreshToken() : HttpClient{
+        return this.removeInterceptor(RefreshTokenInterceptor);
     }
     override disableDefaultUrl(): HttpClient {
         return this.removeInterceptor(SetDefaultUrlInterceptor);
@@ -87,7 +90,6 @@ export class HttpService extends HttpClient {
     }
 
     private removeInterceptor(interceptorType: Function): HttpService {
-        console.log("ew");
         return new HttpService(
             this.httpHandler,
             this.injector,

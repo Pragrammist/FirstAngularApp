@@ -26,7 +26,7 @@ namespace ang_app
                     audience: BearerAccessTokenOptions.AUDIENCE,
                     notBefore: now,
                     claims: claims,
-                    expires: now.Add(TimeSpan.FromMinutes(BearerAccessTokenOptions.LIFETIME)),
+                    expires: now.Add(TimeSpan.FromSeconds(BearerAccessTokenOptions.LIFETIME)),
                     signingCredentials: new SigningCredentials(BearerAccessTokenOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
  

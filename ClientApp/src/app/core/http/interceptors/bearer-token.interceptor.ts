@@ -19,7 +19,7 @@ export class BearerTokenInterceptor implements HttpInterceptor {
     if(!this.userCookieService.isAuthorized() || isDisabled)    
       return next.handle(req);
 
-    const token = this.userCookieService.getJwtToken();
+    const token = this.userCookieService.getAccessToken();
     
     const reqClone = req.clone({
       setHeaders: {"Authorization": "Bearer " + token} 

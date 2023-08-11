@@ -9,7 +9,7 @@ import { UserCookieService } from '../../user/user-cookie.service';
 /** Pass untouched request through to the next request handler. */
 @Injectable()
 export class JsonAcceptContentTypeInterceptor implements HttpInterceptor {
-  constructor(private userCookieService: UserCookieService){}
+  constructor(){}
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const isDisabled = req.context.get(DISABLE_JSON_ACEPT_CONTENT_TYPE);
     if(isDisabled)    

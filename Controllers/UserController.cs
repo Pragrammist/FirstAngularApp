@@ -109,7 +109,7 @@ namespace ang_app.Controllers
             }
 
             token = _tokenService.AccessToken(user.Login, user.Email);
-            refreshToken = _tokenService.RefreshToken(token, user.Email);
+            refreshToken = _tokenService.RefreshToken(user.Login, user.Email);
             var res = new {
                 IsError = false,
                 Message = "Вы авторизовались!",
@@ -132,7 +132,7 @@ namespace ang_app.Controllers
                 return Ok();
             }   
             catch{
-                return BadRequest();
+                return Unauthorized();
             }
             
             
@@ -162,6 +162,22 @@ namespace ang_app.Controllers
                 refreshToken = newRefreshToken,
                 token = accessToken
             });
+        }
+    
+
+        [HttpGet("s5")]
+        [Authorize]
+        public async Task<IActionResult> S5()
+        {
+            await Task.Delay(5000);
+            return Ok();
+        }
+
+        [HttpGet("s10")]
+        [Authorize]
+        public async Task<IActionResult> S10(){
+            await Task.Delay(10000);
+            return Ok();
         }
     }
 }

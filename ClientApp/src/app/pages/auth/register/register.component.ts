@@ -73,9 +73,17 @@ export class RegisterComponent {
             //regRes.token может содерэать null
             //но здесь это не возможно
             // так как нету ошибки с сервера
-            let token = regRes.token as string;
+            
             //вызов логики авторизации
-            this.currentUserService.authorizeAndSendEvent(token, this.userToRegist.login as string, this.userToRegist.email as string);
+            this.currentUserService.authorizeAndSendEvent({ 
+              email:this.userToRegist.email as string,
+              
+              login:this.userToRegist.login as string,
+
+              token:regRes.token as string,
+
+              refreshToken: regRes.refreshToken as string
+            });
             
         }),
         //чтобы можно было показать сообщение с сервера

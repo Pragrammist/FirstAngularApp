@@ -11,8 +11,7 @@ export class AuthorizeUserService{
     private url = "/user/login";
     constructor(private http: HttpClient) {}
     authorize(userLoginModel: UserLoginModel){
-        let httpCl = this.http.disableBearerToken();
-        return httpCl.post<AuthorizeUserResponseModel>(this.url, userLoginModel);
+        return this.http.disableRefreshToken().post<AuthorizeUserResponseModel>(this.url, userLoginModel);
     }
 }
 

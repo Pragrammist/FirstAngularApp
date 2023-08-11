@@ -16,7 +16,6 @@ export class ChangeUserDataService
 
     changeUserData(userData : ChangeUserDataModel)
     {
-        let http2 = this.http.disableBearerToken();
-        return http2.put<ChangeUserDataResponseModel>(this.url, userData);
+        return this.http.put<ChangeUserDataResponseModel>(this.url, userData);
     }
 }
