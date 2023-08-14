@@ -9,13 +9,14 @@ import { GoalsComponent } from './goals/goals.component';
 import { AchievementsComponent } from './achievements/achievements.component';
 import { mainHttpInterceptorProviders } from "./main-http-interceptors-providers";
 import { HttpClientModule } from "@angular/common/http";
+import { SharedModule } from "../../shared/shared.module";
 
 
 @NgModule({
-    imports: [FormsModule, MainRoutingModule, CommonModule], //HttpClientModule, 
     //providers: [mainHttpInterceptorProviders], не влияет ни как
-    declarations: [ HomeComponent, SecretStashComponent, GoalsComponent, AchievementsComponent],
-    exports: [ HomeComponent],
-    bootstrap: [AppComponent],       // экспортируем компонент
+    declarations: [HomeComponent, SecretStashComponent, GoalsComponent, AchievementsComponent],
+    exports: [HomeComponent],
+    bootstrap: [AppComponent],
+    imports: [FormsModule, MainRoutingModule, CommonModule, SharedModule]
 })
 export class MainModule{}

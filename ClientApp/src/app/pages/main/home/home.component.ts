@@ -33,21 +33,6 @@ export class HomeComponent{
   showLogin = false;
   constructor(private changeUserDataService:ChangeUserDataService, private currentUserService : UserService, private http: HttpClient)
   {
-    timer(3000).subscribe({
-      next:()=>{
-        http.get("/user/s5").subscribe();
-        http.get("/user/s10").subscribe();
-      }
-    })
-
-    timer(3000).subscribe({
-      next:()=>{
-        http.get("/user/s5").subscribe();
-        http.get("/user/s10").subscribe();
-      }
-    })
-    
-    
     //чтобы реагировать на изменения логина и почты
     currentUserService.subscribeToUserData((login, email) => {
       this.currentEmail = email;

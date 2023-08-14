@@ -6,5 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./goals.component.css']
 })
 export class GoalsComponent {
+  uploadFiles(files:File[]){
 
+  }
 }

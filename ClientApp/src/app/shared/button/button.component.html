@@ -1,1 +1,12 @@
-<p>{{text}}</p>
+<input type="file" class="file-input"
+       (change)="onFileSelected($event)" #fileUpload>
+
+<div class="file-upload">
+
+    
+    <div *ngFor="let fileName of fileNames">fileName</div>
+
+    <button mat-mini-fab color="primary" class="upload-btn"
+      (click)="fileUpload.click()">
+    </button>
+</div>
