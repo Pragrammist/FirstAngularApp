@@ -6,7 +6,15 @@
     
     <div *ngFor="let fileName of fileNames">fileName</div>
 
-    <button mat-mini-fab color="primary" class="upload-btn"
-      (click)="fileUpload.click()">
+    <button mat-mini-fab color="primary" class="upload-btn" (click)="fileUpload.click()">
+      Загрузить файлы
     </button>
 </div>
+<!-- 
+<div *ngIf="uploadedFiles !== undefined" class="text-success">
+  <div *ngFor="let file of uploadedFiles | async" class="text-success">
+      {{file}}
+  </div>
+</div> -->
+
+

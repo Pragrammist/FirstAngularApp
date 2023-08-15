@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { Output, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-button',
@@ -10,6 +11,8 @@ import { Output, EventEmitter } from '@angular/core';
 export class ButtonComponent {
     fileNames:string[] | undefined
     @Output() filesAddedEvent = new EventEmitter<File[]>();
+    @Input('uploadedFiles') public uploadedFiles$! : Observable<string[]>;
+
     constructor(private http: HttpClient) {}
     
     onFileSelected(event: Event) {
@@ -23,6 +26,6 @@ export class ButtonComponent {
       }
     }
 
-      
+    
 
 }

@@ -1,4 +1,10 @@
-
+.upload-btn{
+  width: fit-content;
+  height: fit-content;
+  background-color: deepskyblue;
+  border: 0;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
 
 .file-input {
     display: none;

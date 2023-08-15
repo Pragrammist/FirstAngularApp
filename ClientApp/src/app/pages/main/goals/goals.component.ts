@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Observable } from 'rxjs';
+import { UploadFilesService } from 'src/app/core/home/upload-files.service';
+
 
 @Component({
   selector: 'app-goals',
@@ -6,7 +9,14 @@ import { Component } from '@angular/core';
   styleUrls: ['./goals.component.css']
 })
 export class GoalsComponent {
-  uploadFiles(files:File[]){
-
+  
+  uploadedFiles$! : Observable<string[]>;
+  constructor(private uploadFilesService : UploadFilesService){
+    
   }
+  uploadFiles(files:File[]){
+    this.uploadedFiles$ = this.uploadFilesService.uploadFilesToGoalEnpoint(files);
+  }
+  
+  
 }

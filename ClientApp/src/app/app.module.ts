@@ -15,6 +15,7 @@ import { HttpService } from './core/http/http.serivce';
 import { BearerTokenInterceptor } from './core/http/interceptors/bearer-token.interceptor';
 import { SetDefaultUrlInterceptor } from './core/http/interceptors/set-default-url.interceptor';
 import { RefreshTokenInterceptor } from './core/http/interceptors/refresh-token.interceptor';
+import { UploadFilesService } from './core/home/upload-files.service';
 
 
 
@@ -32,7 +33,7 @@ import { RefreshTokenInterceptor } from './core/http/interceptors/refresh-token.
     AppRoutingModule
   ],
   providers: [SetDefaultUrlInterceptor, BearerTokenInterceptor, RefreshTokenInterceptor,   {provide: HttpClient, useClass: HttpService},
-     UserService, UserCookieService, AuthorizeUserService, ChangeUserDataService, UserRegisterService],
+     UserService, UserCookieService, AuthorizeUserService, ChangeUserDataService, UserRegisterService, UploadFilesService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

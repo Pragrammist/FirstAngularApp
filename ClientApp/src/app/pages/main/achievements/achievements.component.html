@@ -1,1 +1,6 @@
-<p>achievements works!</p>
+<app-button [uploadedFiles]="uploadedFiles$" (filesAddedEvent)="uploadFiles($event)"></app-button>
+
+
+<div *ngFor="let file of uploadedFiles$ | async" class="text-success">
+    {{file}}
+</div>
